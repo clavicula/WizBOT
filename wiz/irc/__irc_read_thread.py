@@ -8,8 +8,6 @@ import time
 from wiz.util.observer import Observable
 from wiz.util.thread import ResidentThread
 
-from wiz.irc.__message_type import MessageType
-
 
 
 class IRCReadThread(ResidentThread, Observable):
@@ -31,7 +29,7 @@ class IRCReadThread(ResidentThread, Observable):
         if message:
             for line in message.strip().split('\n'):
                 self.__read_buffer.put(line)
-                self.notify_observers(MessageType.RECEIVE)
+                self.notify_observers()
 
 
 

@@ -9,8 +9,6 @@ from wiz.util.observer import Observer
 from wiz.util.observer import Observable
 from wiz.util.thread import ResidentThread
 
-from wiz.irc.__message_type import MessageType
-
 
 
 class IRCWriteThread(ResidentThread, Observer, Observable):
@@ -32,17 +30,13 @@ class IRCWriteThread(ResidentThread, Observer, Observable):
     
     def update(self, target, param = None):
         message = target.get_message()
-        if param == MessageType.RECEIVE:
-            result = re.search(r'^PING (.+)$', message)
-            if result is not None:
-                # PING PONG
-                with self.__lock:
-                    self.__queue.put('PONG ' + result.group(1))
-            else:
-                self.notify_observers(message)
-        elif param == MessageType.SEND:
+        result = re.search(r'^PING (.+)$', message)
+        if result is not None:
+            # PING PONG
             with self.__lock:
-                self.__queue.put(message)
+                self.__queue.put('PONG ' + result.group(1))
+        else:
+            self.notify_observers(message)
     
     def _process(self):
         with self.__lock:

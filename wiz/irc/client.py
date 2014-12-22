@@ -12,7 +12,6 @@ from wiz.irc.__irc_read_thread import IRCReadThread
 from wiz.irc.__irc_read_thread import Receiver
 from wiz.irc.__irc_write_thread import IRCWriteThread
 from wiz.irc.__irc_write_thread import Sender
-from wiz.irc.__message_type import MessageType
 
 
 
