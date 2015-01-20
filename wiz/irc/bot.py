@@ -1,6 +1,8 @@
 
 # -*- coding: utf-8 -*-
 
+import re
+
 from wiz.util.observer import Observer
 
 
@@ -26,7 +28,7 @@ class IRCBOT(MessageListener, Observer):
             channel_name = word_list[2]
             match = re.search(r'.*?:(.+?)!.+? PRIVMSG ' + channel_name + ' :(.+)$', message)
             if match is not None:
-                on_privmsg(channel_name, match.group(1), match.group(2))
+                self.on_privmsg(channel_name, match.group(1), match.group(2))
     
     def update(self, target, param = None):
         self.on_receive(param)
