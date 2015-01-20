@@ -33,7 +33,7 @@ class IRCWriteThread(ResidentThread, Observable, Observer):
             while not self.__queue.empty():
                 self.__sender.send(self.__queue.get())
         
-        # CPUƒŠƒ\[ƒX˜Q”ï‘Îô
+        # CPUãƒªã‚½ãƒ¼ã‚¹æµªè²»å¯¾ç­–
         time.sleep(0.1)
     
     def update(self, target, param = None):

@@ -31,7 +31,7 @@ class IRCReadThread(ResidentThread, Observable):
                 self.__read_buffer.put(line)
                 self.notify_observers()
         
-        # CPUƒŠƒ\[ƒX˜Q”ï‘Îô
+        # CPUãƒªã‚½ãƒ¼ã‚¹æµªè²»å¯¾ç­–
         time.sleep(0.1)
 
 

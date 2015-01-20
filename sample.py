@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+import time
 
 from contextlib import closing
 
@@ -63,7 +64,7 @@ def main():
         
         # Register BOT
         bot = EchoBOT(client)
-        client.add_message_listener(PrivmsgListener(bot))
+        client.add_message_listener(bot)
         
         # Connect and login to server
         client.connect(SERVER_HOST, SERVER_PORT, BOT_NICK_NAME)
@@ -74,7 +75,7 @@ def main():
         
         # Have a nice BOT ;-)
         while not client.is_closed():
-            pass
+            time.sleep(5)
 
 
 
