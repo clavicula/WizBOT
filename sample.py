@@ -5,8 +5,8 @@ import re
 
 from contextlib import closing
 
+from wiz.irc.bot import IRCBOT
 from wiz.irc.client import IRCClient
-from wiz.irc.client import MessageListener
 
 
 
@@ -22,53 +22,48 @@ CHANNEL_LIST  = ["#my-channel", "#your-channel"]
 
 
 
-class PrintBOT(MessageListener):
+class PrintBOT(IRCBOT):
     
     def __init__(self):
-        MessageListener.__init__(self)
+        IRCBOT.__init__(self)
     
-    def on_receive(self, message):
+    def on_privmsg(self, message):
         print(message)
 
 
 
-class CloseBOT(MessageListener):
+class CloseBOT(IRCBOT):
     
     def __init__(self, client):
-        MessageListener.__init__(self)
-        self._client = client
+        IRCBOT.__init__(self)
+        self.__client = client
     
-    def on_receive(self, message):
+    def on_privmsg(self, channel_name, message):
         if re.search(r'bot +--close', message) is not None:
-            client.close()
+            self.__client.close()
 
 
 
-class EchoBOT(MessageListener):
+class EchoBOT(IRCBOT):
     
     def __init__(self, client):
-        MessageListener.__init__(self)
-        self._client = client
+        IRCBOT.__init__(self)
+        self.__client = client
     
-    def on_receive(self, message):
-        word_list = message.split()
-        if word_list[1] == 'PRIVMSG':
-            channel_name = word_list[2]
-            value = re.search(r'.+' + channel_name + ' :(.+)$', message).group(1)
-            client.privmsg(channel_name, value)
+    def on_privmsg(self, channel_name, message):
+        self.__client.privmsg(channel_name, message)
 
 
 
 
 
-if __name__ == '__main__':
+def main():
     # Create IRC client
     with closing(IRCClient()) as client:
         
         # Register BOT
-        client.add_message_listener(PrintBOT())
-        client.add_message_listener(CloseBOT(client))
-        client.add_message_listener(EchoBOT(client))
+        bot = EchoBOT(client)
+        client.add_message_listener(PrivmsgListener(bot))
         
         # Connect and login to server
         client.connect(SERVER_HOST, SERVER_PORT, BOT_NICK_NAME)
@@ -80,4 +75,11 @@ if __name__ == '__main__':
         # Have a nice BOT ;-)
         while not client.is_closed():
             pass
+
+
+
+
+
+if __name__ == '__main__':
+    main()
 

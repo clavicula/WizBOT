@@ -4,6 +4,7 @@
 import re
 import queue
 import threading
+import time
 
 from wiz.util.observer import Observer
 from wiz.util.observer import Observable
@@ -11,22 +12,29 @@ from wiz.util.thread import ResidentThread
 
 
 
-class IRCWriteThread(ResidentThread, Observer, Observable):
+class IRCWriteThread(ResidentThread, Observable, Observer):
     
-    def __init__(self):
+    def __init__(self, sender):
         ResidentThread.__init__(self)
-        Observer.__init__(self)
         Observable.__init__(self)
         self.__lock = threading.RLock()
-        self.__sender = None
+        self.__sender = sender
         self.__queue = queue.Queue()
     
     def put_message(self, message):
         with self.__lock:
             self.__queue.put(message)
     
-    def set_sender(self, sender):
-        self.__sender = sender
+    def process(self):
+        if self.__sender is None:
+            return
+        
+        with self.__lock:
+            while not self.__queue.empty():
+                self.__sender.send(self.__queue.get())
+        
+        # CPUÉäÉ\Å[ÉXòQîÔëŒçÙ
+        time.sleep(0.1)
     
     def update(self, target, param = None):
         message = target.get_message()
@@ -37,19 +45,15 @@ class IRCWriteThread(ResidentThread, Observer, Observable):
                 self.__queue.put('PONG ' + result.group(1))
         else:
             self.notify_observers(message)
-    
-    def _process(self):
-        with self.__lock:
-            while not self.__queue.empty():
-                self.__sender.send(self.__queue.get())
 
 
 
 class Sender(object):
     
-    def __init__(self, local_socket):
+    def __init__(self, local_socket, encode = 'UTF-8'):
         self.__socket = local_socket
+        self.__encode = encode
     
     def send(self, message):
-        self.__socket.send((message + '\n').encode('UTF-8'))
+        self.__socket.send((message + '\n').encode(self.__encode))
 

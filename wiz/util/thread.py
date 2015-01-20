@@ -27,10 +27,10 @@ class ResidentThread(ClosableThread):
     def __init__(self):
         ClosableThread.__init__(self)
     
+    def process(self):
+        raise NotImplementedError
+    
     def run(self):
         while not self.is_terminated():
-            self._process()
-    
-    def _process(self):
-        pass
+            self.process()
 
