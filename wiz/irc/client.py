@@ -40,10 +40,12 @@ class IRCClient(Observer):
         self.__core.close()
         self.__closed = True
     
-    def connect(self, host, port, nick_name, login_name = 'WizBOT', label = 'Wiz_BOT_framework'):
+    def connect(self, host, port, nick_name, login_name = '', label = 'Wiz_BOT_framework'):
         self.__core.connect((host, port))
         self.__read_thread.start()
         self.__write_thread.start()
+        
+        login_name = nick_name if not login_name
         
         self.__write_thread.put_message('USER ' + login_name + ' ' + host + ' ignore ' + label)
         self.__write_thread.put_message('NICK ' + nick_name)
