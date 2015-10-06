@@ -45,9 +45,11 @@ class IRCClient(Observer):
         self.__read_thread.start()
         self.__write_thread.start()
         
-        login_name = nick_name if not login_name
+        if not login_name:
+            login_name = nick_name
         
-        self.__write_thread.put_message('USER ' + login_name + ' ' + host + ' ignore ' + label)
+        message_list = [ 'USER', login_name, host, 'ignore', label ]
+        self.__write_thread.put_message(' '.join(message_list))
         self.__write_thread.put_message('NICK ' + nick_name)
         while not self.__logged_in:
             # Waiting for logged in
@@ -56,11 +58,15 @@ class IRCClient(Observer):
     def is_closed(self):
         return self.__closed
     
-    def join(self, channel_name):
-        self.__write_thread.put_message('JOIN ' + channel_name)
+    def join(self, channel_name, password = ''):
+        message_list = [ 'JOIN', channel_name ]
+        if password:
+            message_list.append(password)
+        self.__write_thread.put_message(' '.join(message_list))
     
     def privmsg(self, channel_name, message):
-        self.__write_thread.put_message('PRIVMSG ' + channel_name + ' :' + message)
+        message_list = [ 'PRIVMSG', channel_name, ':' + message ];
+        self.__write_thread.put_message(' '.join(message_list))
     
     def update(self, target, param = None):
         if re.search(r'(.+)? 001 (.+)$', param) is not None:
