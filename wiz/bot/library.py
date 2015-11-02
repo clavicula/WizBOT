@@ -23,8 +23,18 @@ class LibraryBOT(IRCBOT):
        return False
     
     def on_privmsg(self, channel_name, nick_name, message):
-        if re.search(r'^ *libot +--close *$', message) is not None:
+        if re.search(r'^libot +--close *$', message) is not None:
             self.__client.close()
+            return
+        
+        match_join = re.search(r'^libot +--join +?#(.+)$', message)
+        if match_join is not None:
+            self.__client.join('#' + match_join.group(1))
+            return
+        
+        match_ban = re.search(r'^libot +--ban +?#(.+)$', message)
+        if match_ban is not None:
+            self.__client.part('#' + match_ban.group(1))
             return
         
         if re.search(r'(?i)BOT', nick_name) is not None:

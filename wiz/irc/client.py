@@ -64,6 +64,10 @@ class IRCClient(Observer):
             message_list.append(password)
         self.__write_thread.put_message(' '.join(message_list))
     
+    def part(self, channel_name):
+        message_list = [ 'PART', channel_name, ':cya!' ]
+        self.__write_thread.put_message(' '.join(message_list))
+    
     def privmsg(self, channel_name, message):
         message_list = [ 'PRIVMSG', channel_name, ':' + message ];
         self.__write_thread.put_message(' '.join(message_list))
