@@ -30,9 +30,6 @@ class IRCReadThread(ResidentThread, Observable):
             for line in message.strip().split('\n'):
                 self.__read_buffer.put(line)
                 self.notify_observers()
-        
-        # CPUリソース浪費対策
-        time.sleep(0.1)
 
 
 

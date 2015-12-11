@@ -32,9 +32,6 @@ class IRCWriteThread(ResidentThread, Observable, Observer):
         with self.__lock:
             while not self.__queue.empty():
                 self.__sender.send(self.__queue.get())
-        
-        # CPUリソース浪費対策
-        time.sleep(0.1)
     
     def update(self, target, param = None):
         message = target.get_message()

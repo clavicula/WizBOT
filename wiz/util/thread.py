@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import threading
+import time
 
 
 
@@ -33,4 +34,7 @@ class ResidentThread(ClosableThread):
     def run(self):
         while not self.is_terminated():
             self.process()
+            
+            # CPUリソース浪費対策
+            time.sleep(0.1)
 

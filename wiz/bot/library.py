@@ -49,7 +49,7 @@ class LibraryBOT(IRCBOT):
             self.__on_listup(channel_name, match_find.group(1))
             return
         
-        if message == 'libotls':
+        if re.search(r'^(libot)? *ls$', message) is not None:
             self.__on_listup(channel_name)
             return
         

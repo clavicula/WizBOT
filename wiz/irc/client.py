@@ -18,9 +18,11 @@ from wiz.irc.__irc_write_thread import Sender
 class IRCClient(Observer):
     
     def __init__(self, encode = 'UTF-8'):
+        self.__channel_table_lock = threading.RLock()
         self.__core = self._create_socket()
         self.__closed = False
         self.__logged_in = False
+        self.__channel_table = {}  # name, password
         self.__write_buffer = queue.Queue()
         
         receiver = Receiver(self.__core, encode)
@@ -55,18 +57,30 @@ class IRCClient(Observer):
             # Waiting for logged in
             pass
     
+    def get_channel_name_list(self):
+        with self.__channel_table_lock:
+            return sorted(self.__channel_table.keys())
+    
     def is_closed(self):
         return self.__closed
     
     def join(self, channel_name, password = ''):
-        message_list = [ 'JOIN', channel_name ]
-        if password:
-            message_list.append(password)
+        with self.__channel_table_lock:
+            message_list = [ 'JOIN', channel_name ]
+            if password:
+                message_list.append(password)
+            self.__write_thread.put_message(' '.join(message_list))
+            self.__channel_table[channel_name] = password
+    
+    def notice(self, channel_name, message):
+        message_list = [ 'NOTICE', channel_name, ':' + message ];
         self.__write_thread.put_message(' '.join(message_list))
     
     def part(self, channel_name):
-        message_list = [ 'PART', channel_name, ':cya!' ]
-        self.__write_thread.put_message(' '.join(message_list))
+        with self.__channel_table_lock:
+            message_list = [ 'PART', channel_name, ':cya!' ]
+            self.__write_thread.put_message(' '.join(message_list))
+            del self.__channel_table[channel_name]
     
     def privmsg(self, channel_name, message):
         message_list = [ 'PRIVMSG', channel_name, ':' + message ];
